@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(name='doccleaner-plugins',
-      version='0.1.0',
+      version='0.2.0',
       description='Plugins to connect the doccleaner module to text processing softwares (MS Word, LibreOffice Writer)',
       url='',
       download_url='',
