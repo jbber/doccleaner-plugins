@@ -155,10 +155,10 @@ class WordAddin:
                                         ]
                                         
                         if subFileArg != "":
-                            dc_arguments.append(('--subfile', subFileArg))
+                            dc_arguments.extend(('--subfile', subFileArg))
 
                         if XSLparameter != "":
-                            dc_arguments.append(('--XSLparameter', XSLparameter))                        
+                            dc_arguments.extend(('--XSLparameter', XSLparameter))                        
                                     
                         doccleaner.main(dc_arguments)
 
