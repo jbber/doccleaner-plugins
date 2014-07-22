@@ -148,14 +148,19 @@ class WordAddin:
                             transitionalDoc = newDoc
                             newDoc =  newDocName + str(jj)+ newDocExtension
 
+                        dc_arguments = ['--input', str(transitionalDoc),
+                                        '--output', str(newDoc),
+                                        '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
+                                                                    "docx", str(ctrl. Tag) + ".xsl")
+                                        ]
+                                        
+                        if subFileArg != "":
+                            dc_arguments.append(('--subfile', subFileArg))
 
-                        doccleaner.main(['--input', str(transitionalDoc),
-                                     '--output', str(newDoc),
-                                     '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
-                                                                 "docx", str(ctrl. Tag) + ".xsl"),
-                                     '--subfile', subFileArg,
-                                     '--XSLparameter', XSLparameter
-                                     ])
+                        if XSLparameter != "":
+                            dc_arguments.append(('--XSLparameter', XSLparameter))                        
+                                    
+                        doccleaner.main(dc_arguments)
 
 
                         jj +=1
