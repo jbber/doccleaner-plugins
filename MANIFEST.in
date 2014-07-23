@@ -1,1 +1,1 @@
-recursive-include winword/*.*
+recursive-include dc_winword/*.*

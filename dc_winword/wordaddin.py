@@ -14,15 +14,18 @@ win32com.__path__
 from win32com import universal
 from win32com.server.exception import COMException
 from win32com.client import gencache, DispatchWithEvents
-import winerror
-import pythoncom
 from win32com.client import constants, Dispatch
-import sys
 import win32com.client
-
-import os
 import win32ui
 import win32con
+
+import sys
+
+import winerror
+import pythoncom
+
+import os
+
 import locale
 import gettext
 import configparser
@@ -75,7 +78,7 @@ class WordAddin:
     config = configparser.ConfigParser()
 
     _com_interfaces_ = ['_IDTExtensibility2', 'IRibbonExtensibility']
-    _public_methods_ = ['clean', 'do','GetImage']
+    _public_methods_ = ['do','GetImage']
     _reg_clsctx_ = pythoncom.CLSCTX_INPROC_SERVER
     _reg_clsid_ = "{C5482ECA-F559-45A0-B078-B2036E6F011A}"
     _reg_progid_ = "Python.DocCleaner.WordAddin"
@@ -216,6 +219,9 @@ class WordAddin:
         #TODO :
         self.config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'wordAddin_fr.ini'))
         #Constructing the Word ribbon XML
+        #TODO: compatibility with word 2007
+        #http://schemas.microsoft.com/office/2006/01/customui = word 2007
+        #http://schemas.microsoft.com/office/2009/07/customui = word 2010
         ribbonHeader = '''<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui">
                             <ribbon startFromScratch="false">
                                    <tabs>
