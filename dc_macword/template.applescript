@@ -22,11 +22,11 @@ set py to "doccleaner.py "
 workingDir = $DOCCLEANER_PATH
 
 set callDir to quoted form of workingDir & py
-
+-- TODO: handling the parameters --subfile and --xslparameters
 -- launching doccleaner
 do shell script callDir -i docPath -o tempFile -t $XSL_PATH
 
--- TODO : copying content from tempFile to original doc
+-- TODO : test on MacWord 2004 & 2008 
 tell application "Microsoft Word"
 	set originalDocPath to the full name of the active document
 	set originalDocPath to POSIX path of docpath
