@@ -1,33 +1,29 @@
--- defining a temporary folder
-set tempDir to path to temporary items for user domain
-
--- converting the tempDir path to POSIX form, in order to manipulate it
-set tempDir to POSIX path of tempDir
-
--- generating a path to a temporary file
-set tempFile to quoted form of tempDir & "~" & docName
-
--- retrieving path of doccleaner
-set py to "doccleaner.py "
-workingDir = $DOCCLEANER_PATH
-set callDir to quoted form of workingDir & py
-
--- TODO : test on MacWord 2004 & 2008 
 tell application "Microsoft Word"
-	-- retriving info about the current document
+	-- TODO : test on MacWord 2004 & 2008 
+
+	-- retrieving info about the current document
 	set originalDocPath to the full name of the active document
 	set originalDocPath to POSIX path of docpath
 	set originalDocName to the name of the active document
 	
 	-- setting variables to use the temporary file
 	set tempDir to path to temporary items from user domain
+	
+	-- converting the tempDir path to POSIX form, in order to manipulate it
 	set tempDir to POSIX path of tempDir
-	set tempFile to tempDir & originalDocName
+	
+	-- generating a path to a temporary file
+	set tempFile to quoted form of tempDir & "~" & originalDocName
 	set tempFile to POSIX file tempFile as alias
+	
+	-- retrieving path of doccleaner
+	set py to "doccleaner.py "
+	workingDir = $DOCCLEANER_PATH
+	set doccleaner to quoted form of workingDir & py & " -i " & originalDocPath & " -o " & tempFile & " -t " & $XSL_PATH
 	
 	-- launching doccleaner
 	-- TODO: handling the parameters --subfile and --xslparameters
-	do shell script callDir -i originalDocPath -o tempFile -t $XSL_PATH
+	do shell script doccleaner
 	
 	-- opening the tempFile created by doccleaner
 	activate (open tempFile)
