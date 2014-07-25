@@ -38,12 +38,12 @@ for path, subdirs, files in os.walk(os.path.join(os.path.dirname(doccleaner.__fi
             #Generating a list of commands for osacompile
             command_list = (contents.expandtabs()).split("\n")
             
-            #adding "-e" parameter at the start of each list element
-            command_list = ['-e "{0}"'.format(command) for command in command_list]
+            #adding "-e" parameter at the start of each list element. Don't add parameter if line is empty
+            command_list = [' -e "{0}"'.format(command) for command in command_list if command]
             
             #appending a -o parameter to the list, containing the path to the script we want to compile
             processing_name = os.path.splitext(filename)[0] #TODO: giving a friendlier, localized name to this variable
-            command_list.append('-o '+ os.path.join(SCRIPTS_PATH,  processing_name +".scpt") )
+            command_list.append(' -o '+ os.path.join(SCRIPTS_PATH,  processing_name +".scpt") )
             
             #launching the compilation with osacompile 
             os.system("osacompile " + ''.join(command_list)) #TODO: test...
