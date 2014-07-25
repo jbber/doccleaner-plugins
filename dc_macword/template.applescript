@@ -3,7 +3,7 @@ tell application "Microsoft Word"
 
 	-- retrieving info about the current document
 	set originalDocPath to the full name of the active document
-	set originalDocPath to POSIX path of docpath
+	set originalDocPath to POSIX path of originalDocPath
 	set originalDocName to the name of the active document
 	
 	-- setting variables to use the temporary file
