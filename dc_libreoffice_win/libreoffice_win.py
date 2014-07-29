@@ -59,8 +59,6 @@ def main(argv):
 
     #Retrieving the active document URL, and converting it into a proper system path
     originDocURL = getTrueURL(objDocument.getURL())
-    decomposedURL = urllib.parse.urlparse( originDocURL, 'file:///' )
-    originDocURL = decomposedURL[2]
     originDocPath = urllib.request.url2pathname(originDocURL)
 
     #Retrieving the document name
