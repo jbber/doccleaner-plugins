@@ -5,25 +5,19 @@
 # 1/ Pyuno seems to be usable only with the LibreOffice's embedded Python (can't be installed on a "system Python").
 # 2/ This script needs to use the LXML binary package, which can't be easily installed with the LO's Python
 
-#TODO: Need to improve the usability: how to call this script from a button in LibreOffice?
-
 #Imports:
-#Packages for using the Windows COM api. May need a cleanup.
+#Packages for using the Windows COM api. 
 import win32com.client
-
 #Packages for dealing with command line parameters, path names, temporary files, etc.
 import sys, getopt
 import os
 import tempfile
 import shutil
-
 #Package for working with ini files
 import configparser
-
 #Packages for managing the file URL system of LibreOffice
 import urllib.request
 import urllib.parse
-
 #Package for the xsl processing
 from doccleaner import doccleaner
 
@@ -43,10 +37,10 @@ def getTrueURL(docFalseURL):
     docTrueURL = decomposedURL[2]
     return docTrueURL
 
-
-
 def main(argv):
     #Defining parameters
+    #"-t" : the xsl we want to use to process the current document
+    #"-b" : the button ID in the (upcoming) LibreOffice menu or toolbra
     try:
         opts, args = getopt.getopt(argv,
                                    "t:b:", ["transformationSheet=","buttonID="])
@@ -60,11 +54,9 @@ def main(argv):
             xsl = arg
          if opt in ("-b", "--buttonID"):
              buttonID = arg
-#         if opt in ("-p", "--xslParameter"):
-#             XSLparameter = arg
-    config = configparser.ConfigParser()
-    config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'libreoffice_win_fr.ini'))
 
+    config = configparser.ConfigParser()
+    config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'libreoffice_win_fr.ini')) #TODO : defining the file more dynamically, for better localization handling
 
     #Connecting to LibreOffice
     lo = win32com.client.Dispatch("com.sun.star.ServiceManager")
@@ -84,14 +76,13 @@ def main(argv):
     originDocName = os.path.split(originDocPath)[1]
     transitionalDocPath = originDocPath #Will be useful later for consecutive processings
 
-    #TODO: consecutive processings for each xsl parameter defined in a localized ini file
     #defining the path to the temp output document
     tmp_dir = tempfile.mkdtemp()
     newDocPath = os.path.join(tmp_dir, "~" + originDocName)
-    newDocURL = getTrueURL(urllib.request.pathname2url(newDocPath)) #REMOVE ? urllib.parse.urljoin("file:", urllib.request.pathname2url(newDocPath))
-    jj = 0
-
-
+    newDocURL = getTrueURL(urllib.request.pathname2url(newDocPath)) 
+    jj = 0 #the jj variable is used below, to make consecutive XSL processings, if defined in the ini file
+    
+    #Retrieving the XSL parameters defined in the ini file
     try:
         XSLparameters = config.get(str(buttonID), 'XSLparameter').split(";")
     except:
@@ -112,7 +103,6 @@ def main(argv):
                 subFileArg = config.get(str(buttonID), 'subfile')
 
             if jj > 0:
-
                 #If there is more than one XSL parameter, we'll have to make consecutive processings
                 newDocName, newDocExtension = os.path.splitext(newDocPath)
                 transitionalDoc = newDoc
@@ -134,7 +124,6 @@ def main(argv):
             #launch the xsl processing
             doccleaner.main(dc_arguments)
             jj +=1
-
 
     #Retrieving the contents of the new document
     #TODO: loading the new doc with "hidden" property. Need to use "com.sun.star.beans.PropertyValue", but lo.bridge_getstruct("com.sun.star.beans.PropertyValue") seems to be broken somehow
