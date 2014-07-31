@@ -73,8 +73,11 @@ class generatingOXT():
 
                     #Defining the label translations
                     for key in translation_dictionary.keys():
-                        translation_tags += "\n<value xml:lang=\"{0}\">{1}</value>".format(
-                                                                                        str(key),                                                            )
+                        if key != "default":
+                            translation_tags += "\n<value xml:lang=\"{0}\">{1}</value>".format(
+                                                                                        str(key),
+                                                                                        translation_dictionary[key]
+                                                                                        )
                     #TODO: creating a generic script to call with a parameter
                     xmlBody = ""
                     xmlBody += """<node oor:name="M{0}" oor:op="replace">
