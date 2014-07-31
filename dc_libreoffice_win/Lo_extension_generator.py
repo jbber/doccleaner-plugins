@@ -9,8 +9,6 @@ import doccleaner
 
 class generatingOXT():
     #This class will be used to generate an OXT extension for LibreOffice
-    #TODO: check if it would be better to include it in a separate script
-
     #General variables
     OXT_ID = "myExtension"
     OXT_VERSION = "0.0.1"
@@ -57,6 +55,7 @@ class generatingOXT():
         nodeNumber = 0
         urlNameSpace = r"vnd.sun.star.script" # or r"macro:///" ?
 
+        #TODO: generating menu from the ini file, instead from the content of the docx directory
         for path, subdirs, files in os.walk(os.path.join(os.path.dirname(doccleaner.__file__), 'docx')):#os.walk(os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), "docx")):
             for filename in files:
                 if filename.endswith(".xsl"):
