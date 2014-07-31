@@ -9,14 +9,6 @@
 
 #Imports:
 #Packages for using the Windows COM api. May need a cleanup.
-import win32com
-win32com.__path__
-from win32com import universal
-from win32com.server.exception import COMException
-from win32com.client import gencache, DispatchWithEvents
-import winerror
-import pythoncom
-from win32com.client import constants, Dispatch
 import win32com.client
 
 #Packages for dealing with command line parameters, path names, temporary files, etc.
@@ -25,6 +17,9 @@ import os
 import tempfile
 import shutil
 
+#Package for working with ini files
+import configparser
+
 #Packages for managing the file URL system of LibreOffice
 import urllib.request
 import urllib.parse
@@ -32,30 +27,54 @@ import urllib.parse
 #Package for the xsl processing
 from doccleaner import doccleaner
 
+def documentController(self):
+    #Function for selecting the whole document and put it in a controller
+    documentText = self.getText()
+    cursor = documentText.createTextCursor(  )
+    cursor.collapseToStart()
+    cursor.goToEnd(True)
+    controller = self.CurrentController
+    controller.select(cursor)
+    return controller
 
 def getTrueURL(docFalseURL):
+    #A function to handle the LibreOffice's file URL system
     decomposedURL = urllib.parse.urlparse( docFalseURL, 'file:///' )
     docTrueURL = decomposedURL[2]
     return docTrueURL
 
+
+
 def main(argv):
     #Defining parameters
     try:
-        opts, args = getopt.getopt(argv, "t:", ["transformationSheet="])
+        opts, args = getopt.getopt(argv,
+                                   "t:b:", ["transformationSheet=","buttonID="])
     except:
         sys.exit(2)
 
     xsl = None
+    buttonID = None
     for opt, arg in opts:
         if opt in ("-t", "--transformationSheet"):
             xsl = arg
+         if opt in ("-b", "--buttonID"):
+             buttonID = arg
+#         if opt in ("-p", "--xslParameter"):
+#             XSLparameter = arg
+    config = configparser.ConfigParser()
+    config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'libreoffice_win_fr.ini'))
+
+
     #Connecting to LibreOffice
     lo = win32com.client.Dispatch("com.sun.star.ServiceManager")
     objDesktop= lo.createInstance("com.sun.star.frame.Desktop")
 
     #Get the active document
     objDocument= objDesktop.getCurrentComponent()
-    #Todo: check if the active document is saved
+    objDocumentController = documentController(objDocument)
+
+    #TODO: check if the active document is saved (not a new unsaved doc)
 
     #Retrieving the active document URL, and converting it into a proper system path
     originDocURL = getTrueURL(objDocument.getURL())
@@ -68,40 +87,79 @@ def main(argv):
     #TODO: consecutive processings for each xsl parameter defined in a localized ini file
     #defining the path to the temp output document
     tmp_dir = tempfile.mkdtemp()
-    newDocPath = os.path.join(tmp_dir, "new_"+originDocName)
+    newDocPath = os.path.join(tmp_dir, "~" + originDocName)
     newDocURL = getTrueURL(urllib.request.pathname2url(newDocPath)) #REMOVE ? urllib.parse.urljoin("file:", urllib.request.pathname2url(newDocPath))
+    jj = 0
 
-    subFileArg = "" #TODO
-    XSLparameter = "" #TODO
 
-    dc_arguments = ['--input', str(transitionalDocPath),
-                    '--output', str(newDocPath),
-                    '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
-                            "docx", str(xsl) )
-                    ]
+    try:
+        XSLparameters = config.get(str(buttonID), 'XSLparameter').split(";")
+    except:
+        XSLparameters = ""
+    if XSLparameters != None:
 
-    if subFileArg != "":
-        dc_arguments.extend(('--subfile', subFileArg))
+        for XSLparameter in XSLparameters:
+            #Check if there are subfiles to process consecutively instead of simulteanously (separated by a semi-colon instead of a comma)
+            #NB : the script implies that in the ini file, we can have:
+            # 1) one XSL parameter, and a single subfiles processing
+            # 2) multiple XSL parameters, and the exact same number of consecutive subfiles processings
+            # 3) multiple XSL parameters, and a single subfiles processing
+            #We can never have multiple subfiles and a single XSL processing, because this use case is handled separately by the docCleaner script. If we're in this case, simply split subfiles with commas (",") instead of semi-colon (";")
+            try:
+                subFileArg = str(config.get(str(buttonID), 'subfile')).split(";")[jj]
+            except:
+                #Probably a "out of range" error, which means there is a single subfiles string to process
+                subFileArg = config.get(str(buttonID), 'subfile')
 
-    if XSLparameter != "":
-        dc_arguments.extend(('--XSLparameter', XSLparameter))
+            if jj > 0:
 
-    #launch the xsl processing
+                #If there is more than one XSL parameter, we'll have to make consecutive processings
+                newDocName, newDocExtension = os.path.splitext(newDocPath)
+                transitionalDoc = newDoc
+                newDocPath =  newDocName + str(jj)+ newDocExtension
+                transitionalDocPath = newDocPath
 
-    doccleaner.main(dc_arguments)
-    #objDesktop.loadComponentFromURL(objDocument.getURL(), "_default", 0, ()) #activating the original document
+            dc_arguments = ['--input', str(transitionalDocPath),
+                            '--output', str(newDocPath),
+                            '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
+                                    "docx", str(xsl) )
+                            ]
 
-    #TODO : copy the content of the new doc to the original doc. Maybe using insertDocumentFromURL?
-    #in the meantime, we settle for opening the processed document in LO Writer:
-    objDocument2 = objDesktop.loadComponentFromURL("file://"+newDocURL, "_blank", 0, ())
+            if subFileArg != "":
+                dc_arguments.extend(('--subfile', subFileArg))
 
-#    TODO: removing the temporary folder
-#    objDocument2.close()
-#    try:
-#         shutil.rmtree(folder)
-#         print(folder + " deleted")
-#     except:
-#         pass
+            if XSLparameter != "":
+                dc_arguments.extend(('--XSLparameter', XSLparameter))
+
+            #launch the xsl processing
+            doccleaner.main(dc_arguments)
+            jj +=1
+
+
+    #Retrieving the contents of the new document
+    #TODO: loading the new doc with "hidden" property. Need to use "com.sun.star.beans.PropertyValue", but lo.bridge_getstruct("com.sun.star.beans.PropertyValue") seems to be broken somehow
+    newDocproperties = ()
+    newObjDocument = objDesktop.loadComponentFromURL("file://"+newDocURL, "_blank", 0, newDocproperties )
+    newDocController = documentController(newObjDocument)
+    newContent = newDocController.getTransferable()
+
+    #Inserting the new document into the original document
+    objDocumentController.insertTransferable(newContent)
+
+    #Closing the new document
+    try:
+        newObjDocument.close(False)
+    except Exception as e:
+        print(str(e))
+
+    #Removing the temporary folder
+    try:
+         shutil.rmtree(tmp_dir)
+         print(tmp_dir + " deleted")
+    except Exception as e:
+         print("Deletion of "+ str(tmp_dir) + " failed!")
+         print(str(e))
+         pass
 
 if __name__ == '__main__':
     #Argument to pass: filename of the xsl to apply, e.g. "cleanDirectFormatting.xsl"
