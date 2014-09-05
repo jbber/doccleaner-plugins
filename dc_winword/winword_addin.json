@@ -1,0 +1,60 @@
+{
+    "Processings": {
+        "CleanDirectFormatting": {
+                                    "label": {"fr_FR":"Nettoyer les mises en forme locales"},
+                                    "imageMso":"HappyFace",
+                                    "size":"large",
+                                    "onAction":"do",
+                                    "xsl":[
+                                              {
+                                                   "xslid":"1",
+                                                   "subfile":["word/document.xml", "word/footnotes.xml", "word/endnotes.xml"],
+                                                   "XSLparameter":0,  
+                                                   "getTempDir":0,
+                                                   "XSLname":"cleanDirectFormatting.xsl"
+                                               }
+                                        
+                                          ]
+                                
+                                  },
+        
+        "ActivateHyperlinks": {                                      
+                                  "label": {"fr_FR":"Activer les liens hypertextes"},
+                                  "imageMso":"HappyFace",
+                                  "size":"large",
+                                  "onAction":"do",
+                                  "xsl":[
+                                            {
+                                                 "xslid":"1",
+                                                 "subfile":["word/document.xml", "word/footnotes.xml", "word/endnotes.xml"],  
+                                                 "XSLparameter": 0,  
+                                                 "getTempDir": 1,
+                                                 "XSLname": "hyperlinks_document.xsl"
+                                             },
+                                             {
+                                                 "xslid":"2",
+                                                 "subfile":["word/_rels/document.xml.rels"],  
+                                                 "XSLparameter": 0,  
+                                                 "getTempDir": 1,
+                                                 "XSLname": "hyperlinks_document_rels.xsl"
+                                             },
+                                             {
+                                                 "xslid":"3",
+                                                 "subfile":["word/_rels/footnotes.xml.rels"],  
+                                                 "XSLparameter": 0,  
+                                                 "getTempDir": 1,
+                                                 "XSLname": "hyperlinks_footnotes_rels.xsl"
+                                             },
+                                             {
+                                                 "xslid":"4",
+                                                 "subfile":["word/_rels/endnotes.xml.rels"],  
+                                                 "XSLparameter": 0,  
+                                                 "getTempDir":1,
+                                                 "XSLname": "hyperlinks_endnotes_rels.xsl"
+                                             }   
+                                         ]
+                                    
+                                }  
+    
+    }
+}
