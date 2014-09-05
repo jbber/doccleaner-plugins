@@ -25,14 +25,14 @@ import win32ui
 import win32con
 import locale
 import gettext
-import configparser
+import simplejson
 
 import tempfile
 import shutil
 import mimetypes
 
-
 from doccleaner import doccleaner
+
 #import doccleaner.localization
 #win32com.client.gencache.is_readonly=False
 #win32com.client.gencache.GetGeneratePath()
@@ -43,6 +43,9 @@ gencache.EnsureModule('{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}', 0, 2, 5, bForDem
 # The TLB defining the interfaces we implement
 universal.RegisterInterfaces('{AC0714F2-3D04-11D1-AE7D-00A0C90F26F4}', 0, 1, 0, ["_IDTExtensibility2"])
 universal.RegisterInterfaces('{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}', 0, 2, 5, ["IRibbonExtensibility", "IRibbonControl"])
+
+locale.setlocale(locale.LC_ALL, '')
+user_locale = locale.getlocale()[0]
 
 def checkIfDocx(filepath):
     if mimetypes.guess_type(filepath)[0] == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
@@ -71,8 +74,16 @@ def init_localization():
         trans = gettext.NullTranslations()
 
     trans.install()
+
+def load_json(filename):
+    f = open(filename, "r")
+    data = f.read()
+    f.close()
+    return simplejson.loads(data)
+    
+    
 class WordAddin:
-    config = configparser.ConfigParser()
+    
 
     _com_interfaces_ = ['_IDTExtensibility2', 'IRibbonExtensibility']
     _public_methods_ = ['do','GetImage']
@@ -107,63 +118,44 @@ class WordAddin:
                 #TODO: If the document is in another format than docx, convert it temporarily to docx
                 #At the processing's end, we'll have to convert it back to its original format, so we need to store this information
 
-
-
                 transitionalDoc = originDoc #:Creates a temp transitional doc, which will be used if we need to make consecutive XSLT processings. #E.g..: original doc -> xslt processing -> transitional doc -> xslt processing -> final doc -> copying to original doc
                 newDoc = os.path.join(tmp_dir, "~" + wd.ActiveDocument.Name) #:Creates a temporary file (newDoc), which will be the docCleaner output
 
 
-                jj = 0 #:This variable will be increased by one for each XSL parameter defined in the wordAddin_xx.ini file (separated by a semi-colon ;). Used for handling temp docx filenames, and for subfiles consecutive processing (vs. simulteanous processing, which is already handled in the docCleaner script)
+                jj = 0 #:This variable will be increased by one for each XSL processing defined in the json file
 
                 #Then, we take the current active document as input, the temp doc as output
                 #+ the XSL file passed as argument ("ctrl. Tag" variable, which is a callback for the ribbon button tag)
+                
+                for xsl in self.jsonConf["Processings"][str(ctrl. Tag)]["xsl"]:
+                    
+                    if jj > 0:
+                        
+                        #If there is more than one XSL sheet, we'll have to make consecutive processings
+                        newDocName, newDocExtension = os.path.splitext(newDoc)
+                        transitionalDoc = newDoc
+                        newDoc =  newDocName + str(jj)+ newDocExtension
 
-                #Check if the XSLparameter contains a semi-colon, which means we have to make several XSL processing
-                try:
-                    XSLparameters = self.config.get(str(ctrl. Tag), 'XSLparameter').split(";")
-                except:
-                    XSLparameters = ""
 
-                if XSLparameters != None:
-
-                    for XSLparameter in XSLparameters:
-
-                        #Check if there are subfiles to process consecutively instead of simulteanously (separated by a semi-colon instead of a comma)
-                        #NB : the script implies that in the ini file, we can have:
-                        # 1) one XSL parameter, and a single subfiles processing
-                        # 2) multiple XSL parameters, and the exact same number of consecutive subfiles processings
-                        # 3) multiple XSL parameters, and a single subfiles processing
-                        #We can never have multiple subfiles and a single XSL processing, because this use case is handled separately by the docCleaner script. If we're in this case, simply split subfiles with commas (",") instead of semi-colon (";")
-                        try:
-                            subFileArg = str(self.config.get(str(ctrl. Tag), 'subfile')).split(";")[jj]
-
-                        except:
-                            #Probably a "out of range" error, which means there is a single subfiles string to process
-                            subFileArg = self.config.get(str(ctrl. Tag), 'subfile')
-
-                        if jj > 0:
-
-                            #If there is more than one XSL parameter, we'll have to make consecutive processings
-                            newDocName, newDocExtension = os.path.splitext(newDoc)
-                            transitionalDoc = newDoc
-                            newDoc =  newDocName + str(jj)+ newDocExtension
-
-                        dc_arguments = ['--input', str(transitionalDoc),
-                                        '--output', str(newDoc),
-                                        '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
-                                                                    "docx", str(ctrl. Tag) + ".xsl")
+                    dc_arguments = ['--input', str(transitionalDoc),
+                                    '--output', str(newDoc),
+                                    '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
+                                                                "docx", xsl["XSLname"] ) 
                                         ]
-                                        
-                        if subFileArg != "":
-                            dc_arguments.extend(('--subfile', subFileArg))
+                    
+                    for param in ["subfile", "XSLparameter"]:
+                        if xsl[param] != 0:
+                            dc_arguments.extend( ( '--' + param, ",".join ( xsl[param] ) ) )
+                    if xsl["getTempDir"] != 0:
+                        dc_arguments.append( '--get_tempdir' )
+                    
+                    #TODO : mettre à a jour l'install de doccleaner pour prendre en compte les nouveaux arguments disponibles
+                    doccleaner.main(dc_arguments)
+                    
 
-                        if XSLparameter != "":
-                            dc_arguments.extend(('--XSLparameter', XSLparameter))                        
-                                    
-                        doccleaner.main(dc_arguments)
+                    jj += 1   
 
-
-                        jj +=1
+           
 
                 #Opening the temp file
                 wd.Documents.Open(newDoc)
@@ -212,46 +204,49 @@ class WordAddin:
         return i
 
     def GetCustomUI(self,control):
-        #Getting the button variables from the localized ini file
+    
+       
+        #Getting the button variables from the conf json file
         #TODO :
-        self.config.read(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'wordAddin_fr.ini'))
+        self.jsonConf = load_json(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'winword_addin.json'))
         #Constructing the Word ribbon XML
         ribbonHeader = '''<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui">
-                            <ribbon startFromScratch="false">
-                                   <tabs>
-                                          <tab id="CustomTab" label="Sample tab">
-                                                 <group id="MainGroup" label="Sample group">
+        <ribbon startFromScratch="false">
+            <tabs>
+                <tab id="CustomTab" label="Sample tab">
+                    <group id="MainGroup" label="Sample group">
                        '''
 
-        ribbonFooter = '''</group>
-                     </tab>
-                     </tabs>
-                     </ribbon>
-                     </customUI>
-                 '''
+        ribbonFooter = '''                    </group>
+                </tab>
+            </tabs>
+        </ribbon>
+</customUI>'''
 
         #Initializing the ribbon body
         ribbonBody = ""
         buttonsNumber = 0
 
-        #Generating dynamically the buttons of the ribbon, according to the available XSL sheets for the docx format
-        for path, subdirs, files in os.walk(os.path.join(os.path.dirname(doccleaner.__file__), 'docx')):#os.walk(os.path.join(os.path.dirname(os.path.realpath(sys.argv[0])), "docx")):
-            for filename in files:
-                if filename.endswith(".xsl"):
-                    buttonsNumber += 1
-
-                    ribbonBody += '''<button id="{0}" label="{1}" imageMso="{2}"
-                                size="{3}" onAction="{4}" tag="{5}"/>'''.format(
-                                "Button" + str(buttonsNumber),              #variable {0} : id
-                                self.config.get(filename[:-4], 'label'),    #variable {1} : label, from the ini file
-                                self.config.get(filename[:-4], 'imageMso'), #variable {2} : button icon from the ini file
-                                self.config.get(filename[:-4], 'size'),     #variable {3} : button size from ini file
-                                self.config.get(filename[:-4], 'onAction'), #variable {4} : action from ini file. Call the function do() most of time (onAction=do)
-                                str(filename[:-4])                          #variable {5} : button tag
-                                )
+        #Generating dynamically the buttons of the ribbon, according to the available processings listed in the json conf file
+        for key in self.jsonConf["Processings"]:
+            
+            processing = self.jsonConf["Processings"][key]
+            
+            buttonsNumber += 1
+            
+            ribbonBody += '''<button id="{0}" label="{1}" imageMso="{2}"
+                        size="{3}" onAction="{4}" tag="{5}"/>\n'''.format(
+                        "Button" + str(buttonsNumber),              #variable {0} : id
+                        processing['label'][user_locale],           #variable {1} : label, from the json file
+                        processing['imageMso'],                     #variable {2} : button icon from the json file
+                        processing['size'],                         #variable {3} : button size from json file
+                        processing['onAction'],                     #variable {4} : action from json file. Call the function do() most of time (onAction=do)
+                        str(key)                                    #variable {5} : button tag
+                        )
+                        
         #Generating the final XML for the ribbon
         s = ribbonHeader + ribbonBody + ribbonFooter
-        return s
+        return s           
 
 
     def OnConnection(self, application, connectMode, addin, custom):
@@ -286,7 +281,10 @@ class WordAddin:
 
 
 def RegisterAddin(klass):
-    import winreg
+    if sys.version[:1] == "3":
+        import winreg
+    else:
+        import _winreg as winreg
     key = winreg.CreateKey(winreg.HKEY_CURRENT_USER, "Software\\Microsoft\\Office\\Word\\Addins")
     subkey = winreg.CreateKey(key, klass._reg_progid_)
     winreg.SetValueEx(subkey, "CommandLineSafe", 0, winreg.REG_DWORD, 0)
@@ -300,7 +298,10 @@ def RegisterAddin(klass):
 
 
 def UnregisterAddin(klass):
-    import winreg
+    if sys.version[:1] == "3":
+        import winreg
+    else:
+        import _winreg as winreg
     try:
         winreg.DeleteKey(winreg.HKEY_CURRENT_USER, "Software\\Microsoft\\Office\\Word\\Addins\\" + klass._reg_progid_)
     except WindowsError:
