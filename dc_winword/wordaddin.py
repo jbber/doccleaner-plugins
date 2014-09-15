@@ -86,7 +86,7 @@ class WordAddin:
     
 
     _com_interfaces_ = ['_IDTExtensibility2', 'IRibbonExtensibility']
-    _public_methods_ = ['do','GetImage']
+    _public_methods_ = ['do','GetImage','apply_style']
     _reg_clsctx_ = pythoncom.CLSCTX_INPROC_SERVER
     _reg_clsid_ = "{C5482ECA-F559-45A0-B078-B2036E6F011A}"
     _reg_progid_ = "Python.DocCleaner.WordAddin"
@@ -95,11 +95,22 @@ class WordAddin:
     def __init__(self):
         self.appHostApp = None
 
-
+    def apply_style(self,ctrl):     
+    #The ctrl argument is a callback for the button the user made an action on (e.g. clicking on it)
+    
+        #Creating a word object inside a wd variable
+        wd = win32com.client.Dispatch("Word.Application")
+        
+        try:
+            #wd.Selection.Style = wd.ActiveDocument.Styles(ctrl. Tag)
+            win32ui.MessageBox(str("bla"),"Error",win32con.MB_OK)
+        except Exception as e:
+            win32ui.MessageBox(str(e),"Error",win32con.MB_OK)
+        
+        
     def do(self,ctrl):
     #This is the core of the Word addin : manipulates docs and calls docCleaner
     #The ctrl argument is a callback for the button the user made an action on (e.g. clicking on it)
-
 
         #Creating a word object inside a wd variable
         wd = win32com.client.Dispatch("Word.Application")
@@ -204,49 +215,64 @@ class WordAddin:
         return i
 
     def GetCustomUI(self,control):
-    
-       
+
         #Getting the button variables from the conf json file
-        #TODO :
         self.jsonConf = load_json(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'winword_addin.json'))
+        
         #Constructing the Word ribbon XML
+        #TODO: compatibility with word 2007
+        #http://schemas.microsoft.com/office/2006/01/customui = word 2007
+        #http://schemas.microsoft.com/office/2009/07/customui = word 2010
+        
         ribbonHeader = '''<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui">
         <ribbon startFromScratch="false">
-            <tabs>
-                <tab id="CustomTab" label="Sample tab">
-                    <group id="MainGroup" label="Sample group">
-                       '''
+            <tabs>'''
 
-        ribbonFooter = '''                    </group>
-                </tab>
+        ribbonFooter = '''                    
             </tabs>
         </ribbon>
 </customUI>'''
 
-        #Initializing the ribbon body
-        ribbonBody = ""
-        buttonsNumber = 0
 
         #Generating dynamically the buttons of the ribbon, according to the available processings listed in the json conf file
-        for key in self.jsonConf["Processings"]:
+        tabNumber = 0
+        ribbonContent = ""
+        groupNumber = 0
+        buttonId = 0
+        for tab in self.jsonConf["Tabs"]:
             
-            processing = self.jsonConf["Processings"][key]
+            tabNumber += 1
+            ribbonContent += """<tab id="CustomTab{0}" label="{1}">""".format(tabNumber, tab["label"]["fr_FR"])
             
-            buttonsNumber += 1
             
-            ribbonBody += '''<button id="{0}" label="{1}" imageMso="{2}"
-                        size="{3}" onAction="{4}" tag="{5}"/>\n'''.format(
-                        "Button" + str(buttonsNumber),              #variable {0} : id
-                        processing['label'][user_locale],           #variable {1} : label, from the json file
-                        processing['imageMso'],                     #variable {2} : button icon from the json file
-                        processing['size'],                         #variable {3} : button size from json file
-                        processing['onAction'],                     #variable {4} : action from json file. Call the function do() most of time (onAction=do)
-                        str(key)                                    #variable {5} : button tag
-                        )
-                        
+            for group in tab["groups"]:
+                
+                groupNumber += 1
+                ribbonContent += """<group id="{0}" label="{1}">""".format(
+                    tab["label"]["fr_FR"] + str(groupNumber), 
+                    group["label"]["fr_FR"])
+               
+                
+                for button in group["buttons"]:
+                    
+                    buttonId += 1
+                    ribbonContent += """<button id="{0}" label="{1}" imageMso="{2}" size="{3}" onAction="{4}" tag="{5}"/>""".format(
+                        #group["label"][user_locale] + str(buttonId),
+                        "Button" + str(buttonId),
+                        button["label"][user_locale],
+                        button["imageMso"],
+                        button["size"],
+                        button["onAction"],
+                        button["tag"] )
+                    
+                
+                ribbonContent += """</group>"""
+
+            ribbonContent += """</tab>"""
+
         #Generating the final XML for the ribbon
-        s = ribbonHeader + ribbonBody + ribbonFooter
-        return s           
+        s = ribbonHeader + ribbonContent + ribbonFooter
+        return s 
 
 
     def OnConnection(self, application, connectMode, addin, custom):
