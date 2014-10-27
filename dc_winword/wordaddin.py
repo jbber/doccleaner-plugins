@@ -219,14 +219,22 @@ class WordAddin:
 
     def GetCustomUI(self,control):
         #Getting the button variables from the conf json file
+
         self.jsonConf = load_json(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'winword_addin.json'))
-        
+        wd = win32com.client.Dispatch("Word.Application")
+
         #Constructing the Word ribbon XML
         #TODO: compatibility with word 2007
-        #http://schemas.microsoft.com/office/2006/01/customui = word 2007
-        #http://schemas.microsoft.com/office/2009/07/customui = word 2010
+        if wd.Application.Version == "12.0":
+            #http://schemas.microsoft.com/office/2006/01/customui = word 2007
+            msxmlns = "http://schemas.microsoft.com/office/2006/01/customui"
+        else:
+            #http://schemas.microsoft.com/office/2009/07/customui >= word 2010 
+            msxmlns = "http://schemas.microsoft.com/office/2009/07/customui"
+
         
-        ribbonHeader = '''<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui">
+        
+        ribbonHeader = '''<customUI xmlns="''' + msxmlns + '''">
         <ribbon startFromScratch="false">
             <tabs>'''
 
