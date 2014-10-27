@@ -96,13 +96,13 @@ class WordAddin:
         self.appHostApp = None
 
     def apply_style(self,ctrl):     
-    #The ctrl argument is a callback for the button the user made an action on (e.g. clicking on it)
-    
-        #Creating a word object inside a wd variable
+#    #The ctrl argument is a callback for the button the user made an action on (e.g. clicking on it)
+#    
+#        #Creating a word object inside a wd variable
         wd = win32com.client.Dispatch("Word.Application")
         
         try:
-            #wd.Selection.Style = wd.ActiveDocument.Styles(ctrl. Tag)
+            wd.Selection.Style = wd.ActiveDocument.Styles(ctrl. Tag)
             win32ui.MessageBox(str("bla"),"Error",win32con.MB_OK)
         except Exception as e:
             win32ui.MessageBox(str(e),"Error",win32con.MB_OK)
@@ -137,34 +137,37 @@ class WordAddin:
 
                 #Then, we take the current active document as input, the temp doc as output
                 #+ the XSL file passed as argument ("ctrl. Tag" variable, which is a callback for the ribbon button tag)
+    
+                for tab in self.jsonConf["Tabs"]:
+                    for group in tab["groups"]:
+                        for button in group["buttons"]:
+                            if button["tag"] == "CleanDirectFormatting":
+                                for xsl in button["xsl"]:
+
+                                    if jj > 0:
+                                        
+                                        #If there is more than one XSL sheet, we'll have to make consecutive processings
+                                        newDocName, newDocExtension = os.path.splitext(newDoc)
+                                        transitionalDoc = newDoc
+                                        newDoc =  newDocName + str(jj)+ newDocExtension
                 
-                for xsl in self.jsonConf["Processings"][str(ctrl. Tag)]["xsl"]:
-                    
-                    if jj > 0:
-                        
-                        #If there is more than one XSL sheet, we'll have to make consecutive processings
-                        newDocName, newDocExtension = os.path.splitext(newDoc)
-                        transitionalDoc = newDoc
-                        newDoc =  newDocName + str(jj)+ newDocExtension
-
-
-                    dc_arguments = ['--input', str(transitionalDoc),
-                                    '--output', str(newDoc),
-                                    '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
-                                                                "docx", xsl["XSLname"] ) 
-                                        ]
-                    
-                    for param in ["subfile", "XSLparameter"]:
-                        if xsl[param] != 0:
-                            dc_arguments.extend( ( '--' + param, ",".join ( xsl[param] ) ) )
-                    if xsl["getTempDir"] != 0:
-                        dc_arguments.append( '--get_tempdir' )
-                    
-                    #TODO : mettre à a jour l'install de doccleaner pour prendre en compte les nouveaux arguments disponibles
-                    doccleaner.main(dc_arguments)
-                    
-
-                    jj += 1   
+                
+                                    dc_arguments = ['--input', str(transitionalDoc),
+                                                    '--output', str(newDoc),
+                                                    '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
+                                                                                "docx", xsl["XSLname"] ) 
+                                                        ]
+                                    
+                                    for param in ["subfile", "XSLparameter"]:
+                                        if xsl[param] != 0:
+                                                                                           
+                                            dc_arguments.extend( ( '--' + param, ",".join ( xsl[param] ) ) )
+                                    
+                                    #TODO : mettre à a jour l'install de doccleaner pour prendre en compte les nouveaux arguments disponibles
+                                    doccleaner.main(dc_arguments)
+                                    
+                
+                                    jj += 1   
 
            
 
@@ -215,7 +218,6 @@ class WordAddin:
         return i
 
     def GetCustomUI(self,control):
-
         #Getting the button variables from the conf json file
         self.jsonConf = load_json(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'winword_addin.json'))
         
@@ -249,7 +251,7 @@ class WordAddin:
                 
                 groupNumber += 1
                 ribbonContent += """<group id="{0}" label="{1}">""".format(
-                    tab["label"]["fr_FR"] + str(groupNumber), 
+                    str(group["id"]),
                     group["label"]["fr_FR"])
                
                 
@@ -272,8 +274,10 @@ class WordAddin:
 
         #Generating the final XML for the ribbon
         s = ribbonHeader + ribbonContent + ribbonFooter
+
         return s 
 
+        
 
     def OnConnection(self, application, connectMode, addin, custom):
         print("OnConnection", application, connectMode, addin, custom)
