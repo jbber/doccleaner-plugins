@@ -1,79 +1,59 @@
 {
-    "Tabs": [
-                {
-                "id":"Tab_1",
-                "label":{"fr_FR":"Corrections éditoriales","en_US":"Editorial corrections"},
-                "groups": [
-                                
-                             
-                             {  "id":"group_1", 
-                                "label": {"fr_FR":"Corrections de stylage", "en_US": "??"},
-                                "buttons": [
-                                                     {
-                                                     "tag":"CleanDirectFormatting",                                                        
-                                                     "label": {"fr_FR":"Nettoyer les mises en forme locales"},
-                                                     "imageMso":"HappyFace",
-                                                     "size":"large",
-                                                     "onAction":"do",
-                                                     "xsl":[
-                                                             {
-                                                                 "xslid":"1",
-                                                                 "subfile":"docx.json",
-                                                                 "XSLparameter":0,  
-                                                                 "getTempDir":0,
-                                                                 "XSLname":"cleanDirectFormatting.xsl"
-                                                             }
-                                                            ]
-                                                                         
-                                                     }
-                                            ]
-                              
+    "buttons": [
+                     {
+                     "tag":"CleanDirectFormatting",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"docx.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"cleanDirectFormatting.xsl"
                              }
-                          ]
-                   },
+                            ]
+                                         
+                     },
+					 {
+                     "tag":"Hyperlinks",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"hyperlinks\\Hyperliens_1.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"hyperlinks\\hyperlinks_document.xsl"
+                             },
+							 {
+                                 "xslid":"2",
+                                 "subfile":"hyperlinks\\Hyperliens_2.json",
+                                 "XSLparameter":"file='document'",  
+                                 "getTempDir":0,
+                                 "XSLname":"hyperlinks\\relations.xsl"
+                             },
+							 {
+                                 "xslid":"3",
+                                 "subfile":"hyperlinks\\Hyperliens_3.json",
+                                 "XSLparameter":"file='footnotes'",  
+                                 "getTempDir":0,
+                                 "XSLname":"hyperlinks\\relations.xsl"
+                             },
+							 {
+                                 "xslid":"4",
+                                 "subfile":"hyperlinks\\Hyperliens_4.json",
+                                 "XSLparameter":"file='endnotes'",  
+                                 "getTempDir":0,
+                                 "XSLname":"hyperlinks\\relations.xsl"
+                             }
+                            ]
+                      },
+                      
+                     {                          
+                       "tag":"Titre",                                                                     
+                       "onAction":"apply_style"                                                                                                        
+                     }
+                      
+                ]
+                   
+}                   
                    
                    
-                   
-                   
-
-                {
-                "id":"Tab_2",
-                "label":{"fr_FR":"Styles","en_US":"Styles"},
-                "groups": [
-                                    {
-                                         "id":"group_3", 
-                                         "label": {"fr_FR":"Titres", "en_US": "Titles"},
-                                         "buttons": [
-                                                                 {                          
-                                                                   "tag":"Titre",                                                                     
-                                                                   "label": {"fr_FR":"Titre 2"},
-                                                                   "imageMso":"HappyFace",
-                                                                   "size":"normal",
-                                                                   "onAction":"apply_style"                                                                                                        
-                                                                 },
-                                                                    
-                                                                 {
-                                                                   "tag":"Titre",                                                                     
-                                                                   "label": {"fr_FR":"Titre 3"},
-                                                                   "imageMso":"HappyFace",
-                                                                   "size":"normal",
-                                                                   "onAction":"apply_style"                                                          
-                                                                 }
-                                                    ]
-                                    }
-                          ]
-                             
-                            
-                }
-
-
-                      
-                      
-                      
-                      
-            ]
-                
-                
-    
-
-}

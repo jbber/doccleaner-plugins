@@ -1,0 +1,17 @@
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui">
+	<ribbon startFromScratch="false">
+        <tabs>
+			<tab id="Corrections1" label="Corrections Editoriales">
+				<group id="test1" label="Test">
+					<button id="test2" label="Nettoyer les mises en forme locales" imageMso="HappyFace" size="normal" onAction="do" tag="CleanDirectFormatting"/>
+					<button id="test3" label="Activer les liens hypertextes" imageMso="HappyFace" size="normal" onAction="do" tag="Hyperlinks"/>
+				</group>
+			</tab>
+			<tab id="Styles" label="Styles">
+				<group id="test4" label="Test2">
+					<button id="test5" label="Titre 2" imageMso="HappyFace" size="normal" onAction="apply_style" tag="Titre"/>
+				</group>
+			</tab>
+	    </tabs>
+    </ribbon>
+</customUI>

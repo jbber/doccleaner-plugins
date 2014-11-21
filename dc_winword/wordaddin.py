@@ -39,10 +39,14 @@ from doccleaner import doccleaner
 # Support for COM objects we use.
 gencache.EnsureModule('{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}', 0, 2, 1, bForDemand=True) # Office 9
 gencache.EnsureModule('{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}', 0, 2, 5, bForDemand=True)
+gencache.EnsureModule('{00020905-0000-0000-C000-000000000046}', 0, 8, 5) #Word
 
 # The TLB defining the interfaces we implement
-universal.RegisterInterfaces('{AC0714F2-3D04-11D1-AE7D-00A0C90F26F4}', 0, 1, 0, ["_IDTExtensibility2"])
-universal.RegisterInterfaces('{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}', 0, 2, 5, ["IRibbonExtensibility", "IRibbonControl"])
+try:
+    universal.RegisterInterfaces('{AC0714F2-3D04-11D1-AE7D-00A0C90F26F4}', 0, 1, 0, ["_IDTExtensibility2"])
+    universal.RegisterInterfaces('{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}', 0, 2, 5, ["IRibbonExtensibility", "IRibbonControl"])
+except:
+    pass
 
 locale.setlocale(locale.LC_ALL, '')
 user_locale = locale.getlocale()[0]
@@ -115,12 +119,11 @@ class WordAddin:
         #Creating a word object inside a wd variable
         wd = win32com.client.Dispatch("Word.Application")
 
-
         try:
             #Check if the file is not a new one (unsaved)
             if os.path.isfile(wd.ActiveDocument.FullName) == True:
                 #Before processing the doc, let's save the user's last modifications
-
+                #TODO: ne fonctionne pas correctement
                 wd.ActiveDocument.Save
 
                 originDoc = wd.ActiveDocument.FullName #:Puts the path of the current file in a variable
@@ -138,38 +141,36 @@ class WordAddin:
                 #Then, we take the current active document as input, the temp doc as output
                 #+ the XSL file passed as argument ("ctrl. Tag" variable, which is a callback for the ribbon button tag)
     
-                for tab in self.jsonConf["Tabs"]:
-                    for group in tab["groups"]:
-                        for button in group["buttons"]:
-                            if button["tag"] == "CleanDirectFormatting":
-                                for xsl in button["xsl"]:
-
-                                    if jj > 0:
-                                        
-                                        #If there is more than one XSL sheet, we'll have to make consecutive processings
-                                        newDocName, newDocExtension = os.path.splitext(newDoc)
-                                        transitionalDoc = newDoc
-                                        newDoc =  newDocName + str(jj)+ newDocExtension
-                
-                
-                                    dc_arguments = ['--input', str(transitionalDoc),
-                                                    '--output', str(newDoc),
-                                                    '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
-                                                                                "docx", xsl["XSLname"] ) 
-                                                        ]
+                for button in self.jsonConf["buttons"]:
+                    if button["tag"] == ctrl. Tag:
+                        for xsl in button["xsl"]:
+                            if jj > 0:
+                                
+                                #If there is more than one XSL sheet, we'll have to make consecutive processings
+                                newDocName, newDocExtension = os.path.splitext(newDoc)
+                                transitionalDoc = newDoc
+                                newDoc =  newDocName + str(jj)+ newDocExtension
+        
+        
+                            dc_arguments = ['--input', str(transitionalDoc),
+                                            '--output', str(newDoc),
+                                            '--transform', os.path.join(os.path.dirname(doccleaner.__file__),
+                                                                        "docx", xsl["XSLname"] ) 
+                                                ]
+                            
+                            for param in ["subfile", "XSLparameter"]:
+                                if xsl[param] != 0:
+                                    if param == "subfile":
+                                        str_param = os.path.join(os.path.dirname(doccleaner.__file__),
+                                                                        "docx", xsl[param])     
+                                    else:
+                                        str_param = xsl[param]
                                     
-                                    for param in ["subfile", "XSLparameter"]:
-                                        if xsl[param] != 0:
-                                                                                           
-                                            dc_arguments.extend( ( '--' + param, ",".join ( xsl[param] ) ) )
-                                    
-                                    #TODO : mettre à a jour l'install de doccleaner pour prendre en compte les nouveaux arguments disponibles
-                                    doccleaner.main(dc_arguments)
-                                    
-                
-                                    jj += 1   
-
-           
+                                    dc_arguments.extend( ( '--' + param, str_param)) #",".join ( str_param )  )) 
+                            
+                            doccleaner.main(dc_arguments)                                    
+                            jj += 1   
+          
 
                 #Opening the temp file
                 wd.Documents.Open(newDoc)
@@ -217,75 +218,13 @@ class WordAddin:
         i = LoadImage( 'path/to/image.png' )
         return i
 
-    def GetCustomUI(self,control):
-        #Getting the button variables from the conf json file
-
+    def GetCustomUI(self,control):       
         self.jsonConf = load_json(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'winword_addin.json'))
-        wd = win32com.client.Dispatch("Word.Application")
-
-        #Constructing the Word ribbon XML
-        #TODO: compatibility with word 2007
-        if wd.Application.Version == "12.0":
-            #http://schemas.microsoft.com/office/2006/01/customui = word 2007
-            msxmlns = "http://schemas.microsoft.com/office/2006/01/customui"
-        else:
-            #http://schemas.microsoft.com/office/2009/07/customui >= word 2010 
-            msxmlns = "http://schemas.microsoft.com/office/2009/07/customui"
-
-        
-        
-        ribbonHeader = '''<customUI xmlns="''' + msxmlns + '''">
-        <ribbon startFromScratch="false">
-            <tabs>'''
-
-        ribbonFooter = '''                    
-            </tabs>
-        </ribbon>
-</customUI>'''
-
-
-        #Generating dynamically the buttons of the ribbon, according to the available processings listed in the json conf file
-        tabNumber = 0
-        ribbonContent = ""
-        groupNumber = 0
-        buttonId = 0
-        for tab in self.jsonConf["Tabs"]:
-            
-            tabNumber += 1
-            ribbonContent += """<tab id="CustomTab{0}" label="{1}">""".format(tabNumber, tab["label"]["fr_FR"])
-            
-            
-            for group in tab["groups"]:
-                
-                groupNumber += 1
-                ribbonContent += """<group id="{0}" label="{1}">""".format(
-                    str(group["id"]),
-                    group["label"]["fr_FR"])
-               
-                
-                for button in group["buttons"]:
-                    
-                    buttonId += 1
-                    ribbonContent += """<button id="{0}" label="{1}" imageMso="{2}" size="{3}" onAction="{4}" tag="{5}"/>""".format(
-                        #group["label"][user_locale] + str(buttonId),
-                        "Button" + str(buttonId),
-                        button["label"][user_locale],
-                        button["imageMso"],
-                        button["size"],
-                        button["onAction"],
-                        button["tag"] )
-                    
-                
-                ribbonContent += """</group>"""
-
-            ribbonContent += """</tab>"""
-
-        #Generating the final XML for the ribbon
-        s = ribbonHeader + ribbonContent + ribbonFooter
-
-        return s 
-
-        
+        xml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'winword_addin.xml')
+        xml_file = open(xml_path, "r")
+        xml_content = xml_file.read()
+        xml_file.close()            
+        return xml_content         
 
     def OnConnection(self, application, connectMode, addin, custom):
         print("OnConnection", application, connectMode, addin, custom)
@@ -301,6 +240,7 @@ class WordAddin:
                 print("The source of the error is", source)
                 print("The error message is", text)
                 print("More info can be found in {0} (id={1})".format(str(helpFile), helpId))
+           
 
     def OnDisconnection(self, mode, custom):
         print("OnDisconnection")
