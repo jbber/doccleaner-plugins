@@ -90,7 +90,7 @@ class WordAddin:
     
 
     _com_interfaces_ = ['_IDTExtensibility2', 'IRibbonExtensibility']
-    _public_methods_ = ['do','GetImage','apply_style']
+    _public_methods_ = ['do', 'apply_style']
     _reg_clsctx_ = pythoncom.CLSCTX_INPROC_SERVER
     _reg_clsid_ = "{C5482ECA-F559-45A0-B078-B2036E6F011A}"
     _reg_progid_ = "Python.DocCleaner.WordAddin"
@@ -106,11 +106,12 @@ class WordAddin:
         wd = win32com.client.Dispatch("Word.Application")
         
         try:
+            #Applying style
             wd.Selection.Style = wd.ActiveDocument.Styles(ctrl. Tag)
-            win32ui.MessageBox(str("bla"),"Error",win32con.MB_OK)
-        except Exception as e:
-            win32ui.MessageBox(str(e),"Error",win32con.MB_OK)
-        
+        except:
+            #If style does not exist -> create it, then apply it
+            wd.ActiveDocument.Styles.Add(ctrl. Tag)
+            wd.Selection.Style = wd.ActiveDocument.Styles(ctrl. Tag)
         
     def do(self,ctrl):
     #This is the core of the Word addin : manipulates docs and calls docCleaner
@@ -203,13 +204,11 @@ class WordAddin:
         except Exception as e:
 
             tb = sys.exc_info()[2]
-
+            #TODO: writing the error to a log file
             win32ui.MessageBox(str(e) + "\n" +
             str(tb.tb_lineno)+ "\n" +
             str(newDoc)
             ,"Error",win32con.MB_OKCANCEL)
-
-
 
     def GetImage(self,ctrl):
         #TODO : Is this function actually useful?

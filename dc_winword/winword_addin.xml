@@ -8,8 +8,12 @@
 				</group>
 			</tab>
 			<tab id="Styles" label="Styles">
-				<group id="test4" label="Test2">
-					<button id="test5" label="Titre 2" imageMso="HappyFace" size="normal" onAction="apply_style" tag="Titre"/>
+				<group id="test4" label="Test2">					
+					<dropDown id="dropDown" label="Titres">
+						<button id="test5" label="Titre 2" imageMso="HappyFace" onAction="apply_style" tag="Titre 2" screentip="Titre 2" supertip="Ceci est un titre de niveau 2"/>
+						<button id="test6" label="Titre 3" imageMso="HappyFace" onAction="apply_style" tag="Titre 3"/>
+						<button id="test7" label="azertyqwerty" imageMso="HappyFace" onAction="apply_style" tag="azertyqwerty" screentip="azertyqwerty" supertip="Ceci est un style fictif"/>
+					</dropDown>
 				</group>
 			</tab>
 	    </tabs>
