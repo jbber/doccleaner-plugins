@@ -32,7 +32,6 @@ import shutil
 import mimetypes
 
 from doccleaner import doccleaner
-
 #import doccleaner.localization
 #win32com.client.gencache.is_readonly=False
 #win32com.client.gencache.GetGeneratePath()
@@ -189,14 +188,14 @@ class WordAddin:
 
                 #Saving the changes
                 wd.Documents(originDoc).Save
-
+                
                 #Removing the whole temp folder
                 try:
                     shutil.rmtree(tmp_dir)
                 except:
                     #TODO: What kind of error would be possible when removing the temp folder? How to handle it?
                     pass
-
+                wd.ActiveDocument.Save
             else:
                 win32ui.MessageBox("You need to save the file before launching this script!"
                 ,"Error",win32con.MB_OK)
@@ -221,8 +220,10 @@ class WordAddin:
         self.jsonConf = load_json(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'winword_addin.json'))
         xml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'winword_addin.xml')
         xml_file = open(xml_path, "r")
-        xml_content = xml_file.read()
-        xml_file.close()            
+        
+        xml_content = xml_file.read().encode('windows-1252').decode('utf-8') #.encode('windows-1252').decode('utf-8') -> or special characters will behave strangely
+        xml_file.close()    
+
         return xml_content         
 
     def OnConnection(self, application, connectMode, addin, custom):

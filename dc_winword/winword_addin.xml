@@ -1,21 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui">
 	<ribbon startFromScratch="false">
         <tabs>
-			<tab id="Corrections1" label="Corrections Editoriales">
+			<tab id="Corrections1" label="Corrections éditoriales">
 				<group id="test1" label="Test">
-					<button id="test2" label="Nettoyer les mises en forme locales" imageMso="HappyFace" size="normal" onAction="do" tag="CleanDirectFormatting"/>
-					<button id="test3" label="Activer les liens hypertextes" imageMso="HappyFace" size="normal" onAction="do" tag="Hyperlinks"/>
+					<button id="test2" label="Suppression des mises en forme locales" imageMso="ClearFormatting" size="normal" onAction="do" tag="CleanDirectFormatting" screentip="Suppression des mises en forme locales" supertip="Cette macro permet de supprimer dans le corps de texte la plupart des mises en forme locales et des styles de caractères locaux, tout en conservant les mises en forme suivantes : italiques, gras, petites majuscules, tout en majuscules, exposant, indice, soulignement ainsi que toutes les combinaisons possibles de ces mises en forme. Une fois la macro appliquée, il est nécessaire de s’assurer que tous les styles locaux ont bien été éliminés."/>
+					<button id="test3" label="Rendre les liens hypertextes actifs" imageMso="HyperlinkInsert" size="normal" onAction="do" tag="Hyperlinks" screentip="Rendre les liens hypertextes actifs" supertip="Cette macro transforme en liens actifs les URL présentes à l’origine en texte simple."/>
+					<button id="test4" label="Rétablir les espaces insécables dans le corps de texte" imageMso="O" size="normal" onAction="do" tag="nonbreakingspaces" screentip="Rétablir les espaces insécables dans le corps de texte" supertip="Cette macro effectue les actions suivantes dans le corps de texte :&#13; ajout d’espaces insécables devant les signes de ponctuation doubles et certains symboles ( ? ; : ! % =) ;&#13; ajout d’espaces insécables après les guillemets français ouvrants et avant les guillemets français fermants ;&#13; ajout d’espaces insécables après les abréviations suivantes : « n° », « pp. », « vol. » ;&#13; remplacement des espaces normales par des espaces insécables dans les nombres à plus de 4 chiffres ;&#13; ajout d’espaces insécables après les abréviations de type « p. » ou « t. », si elles sont suivies d’un chiffre arabe. Si un chiffre arabe est présent avant, l’espace insécable est ajoutée avant, entre le chiffre et l’abréviation.  ;&#13; suppression des espaces insécables dans les passages que Word détecte en anglais britannique ou en anglais américain ;&#13; suppression des espaces doubles."/>
+					<button id="test5" label="Remplacer les apostrophes verticales par des apostrophes typographiques" size="normal" onAction="do" tag="curlyapostrophes" screentip="Remplacer les apostrophes verticales par des apostrophes typographiques" supertip="La macro remplace les apostrophes droites (ex. : l'/d') par des apostrophes courbes ou typographiques (ex. : l’/d’)."/>
+					<button id="test6" label="Supprimer les points à la fin des titres" imageMso="HappyFace" size="normal" onAction="do" tag="pointtiles" screentip="Supprimer les points à la fin des titres" supertip="Cette macro supprime les points présents à la fin des paragraphes stylés en tant qu’intertitres (de « Titre 1 » à « Titre 6 »)."/>
+					<button id="test7" label="Supprimer sauts para resumes" imageMso="HappyFace" size="normal" onAction="do" tag="abstractspara" screentip="azertyqwerty" supertip="Ceci est un style fictif"/>
+					<button id="test8" label="Remplacer les guillemets droits par des guillemets anglais" imageMso="HappyFace" size="normal" onAction="do" tag="quotationmarks" screentip="Remplacer les guillemets droits par des guillemets anglais" supertip="Cette macro remplace les guillemets droits (&quot; &quot;) par des guillemets français ouvrants et fermants, avec des espaces insécables (« »)."/>
+					<button id="test9" label="Vérifier les paragraphes" imageMso="HappyFace" size="normal" onAction="do" tag="ponctuationpara" screentip="Vérifier les paragraphes" supertip="Cette macro détecte les paragraphes commençant par une minuscule ou ne se terminant pas par un point. Ex. d’utilisation : documents issus de fichiers PDF où des sauts de paragraphes inopinés apparaissent souvent au milieu des phrases. "/>
+					<button id="test10" label="Supprimer les doubles sauts de paragraphe" imageMso="HappyFace" size="normal" onAction="do" tag="emptyline" screentip="Supprimer les doubles sauts de paragraphe" supertip="Cette macro supprime les paragraphes vides."/>
+					<button id="test11" label="Renumérotation des notes" imageMso="FootnoteEndnoteDialog" size="normal" onAction="do" tag="endnotesnumber" screentip="Renumérotation des notes" supertip="Cette macro permet de renuméroter les notes à partir de 1. Cela permet par exemple de corriger des numérotations discontinues ou erronées (lorsque toutes les notes sont numérotées &quot;0&quot;, par exemple)."/>
 				</group>
+				
 			</tab>
-			<tab id="Styles" label="Styles">
-				<group id="test4" label="Test2">					
-					<dropDown id="dropDown" label="Titres">
-						<button id="test5" label="Titre 2" imageMso="HappyFace" onAction="apply_style" tag="Titre 2" screentip="Titre 2" supertip="Ceci est un titre de niveau 2"/>
-						<button id="test6" label="Titre 3" imageMso="HappyFace" onAction="apply_style" tag="Titre 3"/>
-						<button id="test7" label="azertyqwerty" imageMso="HappyFace" onAction="apply_style" tag="azertyqwerty" screentip="azertyqwerty" supertip="Ceci est un style fictif"/>
-					</dropDown>
-				</group>
-			</tab>
+
 	    </tabs>
     </ribbon>
 </customUI>
