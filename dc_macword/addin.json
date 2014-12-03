@@ -1,0 +1,168 @@
+{
+    "buttons": [
+                     {
+                     "tag":"CleanDirectFormatting",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"docx.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"cleanDirectFormatting.xsl"
+                             }
+                            ]
+                                         
+                     },
+                     
+					 {
+                     "tag":"Hyperlinks",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"Hyperliens_1.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"hyperlinks_document.xsl"
+                             },
+							 {
+                                 "xslid":"2",
+                                 "subfile":"Hyperliens_2.json",
+                                 "XSLparameter":"file='document'",  
+                                 "getTempDir":0,
+                                 "XSLname":"relations.xsl"
+                             },
+							 {
+                                 "xslid":"3",
+                                 "subfile":"Hyperliens_3.json",
+                                 "XSLparameter":"file='footnotes'",  
+                                 "getTempDir":0,
+                                 "XSLname":"relations.xsl"
+                             },
+							 {
+                                 "xslid":"4",
+                                 "subfile":"Hyperliens_4.json",
+                                 "XSLparameter":"file='endnotes'",  
+                                 "getTempDir":0,
+                                 "XSLname":"relations.xsl"
+                             }
+                            ]
+                      },
+                      
+                      {
+                     "tag":"nonbreakingspaces",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"Insecables.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"insecables.xsl"
+                             }
+                            ]
+                      },       
+                      
+                      {
+                     "tag":"curlyapostrophes",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"Apostrophes_typo.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"apostrophe_document.xsl"
+                             }
+                            ]
+                      },
+                      
+                      {
+                     "tag":"pointtiles",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"Points_titres.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"points_titres_document.xsl"
+                             }
+                            ]
+                      },
+                      
+                      {
+                     "tag":"abstractspara",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"Saut_para_resume_affiliation.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"sauts_paragraphes_resumes_affiliations.xsl"
+                             }
+                            ]
+                      },
+                      
+                      {
+                     "tag":"quotationmarks",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"Guillemets.json",
+                                 "XSLparameter":"lang='fr'",  
+                                 "getTempDir":0,
+                                 "XSLname":"guillemets.xsl",
+                                 "comment":"open_quotes='«',closing_quotes='»'"                             }
+                            ]
+                      },                      
+                      
+                      
+                       {
+                     "tag":"ponctuationpara",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"Ponctuation_para_1.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"Ponctuation_paragraphes.xsl"
+                             },
+							 {
+                                 "xslid":"2",
+                                 "subfile":"Ponctuation_para_2.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"Ponctuation_paragraphes_comments.xsl"
+                             }
+                            ]
+                      },
+                    
+                      {
+                     "tag":"emptyline",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"Double_saut_para.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"double_saut_paragraphe.xsl"
+                             }
+                            ]
+                      },   
+                             
+                      {
+                     "tag":"endnotesnumber",                                                        
+                     "xsl":[
+                             {
+                                 "xslid":"1",
+                                 "subfile":"Renumerotation_notes.json",
+                                 "XSLparameter":0,  
+                                 "getTempDir":0,
+                                 "XSLname":"Numerotation_notes.xsl"
+                             }
+                            ]
+                      }              
+                      
+                 ]
+
+                   
+}                   
+                   
+                   
