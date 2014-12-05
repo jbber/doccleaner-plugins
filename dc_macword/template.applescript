@@ -34,7 +34,7 @@ tell application "Microsoft Word"
 		set xslpath to item XSL_PATH of item jj of processings
 		set subfile to item SUBFILE of item jj of processings
 		set xslparameter to item XSLPARAMETER of item jj of processings
-		if (xslparameter != "0") then
+		if (xslparameter doesn't equal "0") then
 			set doccleaner to quoted form of workingDir & py & " -i " & transitionalDoc & " -o " & tempFile & " -t " & xslpath & " -s " & subfile & " - p "& xslparameter
 		else
 			set doccleaner to quoted form of workingDir & py & " -i " & transitionalDoc & " -o " & tempFile & " -t " & xslpath & " -s " & subfile

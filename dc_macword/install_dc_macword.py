@@ -42,7 +42,7 @@ for button in jsonConf["buttons"]:
     data = ""    
     #data = ",".join(xsl for xsl in button["xsl"])
     print data
-    data = ",".join(str(""" {0}:{{XSL_PATH:{1}, SUBFILE:{2}, XSLPARAMETER:{3} }}""".format(
+    data = ",".join(str(""" |{0}|:{{XSL_PATH:{1}, SUBFILE:{2}, XSLPARAMETER:{3} }}""".format(
                                                                                              xsl["xslid"],
                                                                                              '"'+str( os.path.join(os.path.dirname(__file__), "docx", xsl["XSLname"]) )+'"',
                                                                                              '"'+str( os.path.join(os.path.dirname(__file__), "docx", xsl["subfile"]) )+'"',
@@ -76,6 +76,4 @@ for button in jsonConf["buttons"]:
     jj+=1
     #launching the compilation with osacompile 
     os.system("osacompile " + ''.join(command_list)) #TODO: test...
-
-
 
