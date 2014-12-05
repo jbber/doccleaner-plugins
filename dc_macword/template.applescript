@@ -19,11 +19,11 @@ tell application "Microsoft Word"
 	-- retrieving path of doccleaner
 	set py to "doccleaner.py "
 	workingDir = $DOCCLEANER_PATH
-	
+	set processings to {$PROCESSINGS}
 	set transitionalDoc to originalDocPath
 	--loop here
 	set jj to 1
-	
+
 	repeat $XSLNUMBER times
 
 		if (jj > 1) then	
@@ -31,13 +31,13 @@ tell application "Microsoft Word"
 			set tempFile to quoted form of tempDir & "~" & jj & originalDocName
 			set tempFile to POSIX file tempFile as alias
 		end if
-		set xslpath to item XSL_PATH of item jj of $PROCESSINGS
-		set subfile to item SUBFILE of item jj of $PROCESSINGS
-		set xslparameter to item XSLPARAMETER of item jj of $PROCESSINGS
-		if $XSLPARAMETER != "0" 
-			set doccleaner to quoted form of workingDir & py & " -i " & transitionalDoc & " -o " & tempFile & " -t " & XSL_PATH & " -s " & SUBFILE & " - p "& XSLPARAMETER
+		set xslpath to item XSL_PATH of item jj of processings
+		set subfile to item SUBFILE of item jj of processings
+		set xslparameter to item XSLPARAMETER of item jj of processings
+		if (xslparameter != "0") then
+			set doccleaner to quoted form of workingDir & py & " -i " & transitionalDoc & " -o " & tempFile & " -t " & xslpath & " -s " & subfile & " - p "& xslparameter
 		else
-			set doccleaner to quoted form of workingDir & py & " -i " & transitionalDoc & " -o " & tempFile & " -t " & XSL_PATH & " -s " & SUBFILE
+			set doccleaner to quoted form of workingDir & py & " -i " & transitionalDoc & " -o " & tempFile & " -t " & xslpath & " -s " & subfile
 		end if
 		-- launching doccleaner
 		do shell script doccleaner

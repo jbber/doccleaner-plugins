@@ -32,39 +32,37 @@ def load_json(filename):
 
 jsonConf = load_json(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'addin.json'))
 path_dict = {}
+data = ""
 jj = 0
 for button in jsonConf["buttons"]:
 
-    DOCCLEANER_PATH = '"' + os.path.dirname(doccleaner.__file__) + '"'
+    path_dict["DOCCLEANER_PATH"] = '"' + os.path.dirname(doccleaner.__file__) + '"'
+    path_dict["XSLNUMBER"] = len(button["xsl"])
 
-    #path_dict['DOCCLEANER_PATH'] = DOCCLEANER_PATH
-    XSLNUMBER = len(button["xsl"])
-    for xsl in button["xsl"]:
+    data = ""    
+    #data = ",".join(xsl for xsl in button["xsl"])
+    print data
+    data = ",".join(str(""" {0}:{{XSL_PATH:{1}, SUBFILE:{2}, XSLPARAMETER:{3} }}""".format(
+                                                                                             xsl["xslid"],
+                                                                                             '"'+str( os.path.join(os.path.dirname(__file__), "docx", xsl["XSLname"]) )+'"',
+                                                                                             '"'+str( os.path.join(os.path.dirname(__file__), "docx", xsl["subfile"]) )+'"',
+                                                                                             '"'+str( xsl["XSLparameter"] )+'"',                                                                                                                                                              
+                                                                                            ) ) for xsl in button["xsl"])
 
+    with open("template.applescript", "r") as f:
+        contents = f.read()
         
-        with open("template.applescript", "r") as f:
-            contents = f.read()
+                                                                                                                            
+    path_dict["PROCESSINGS"] = data
         
-        xslid = str(xsl["xslid"])
-                                                       
-        path_dict[xslid] = {'XSL_PATH': str( os.path.join(os.path.dirname(__file__), "docx", xsl["XSLname"]) ), 
-                            'SUBFILE': str( os.path.join(os.path.dirname(__file__), "docx", xsl["subfile"]) ),
-                            'XSLPARAMETER':str( xsl["XSLparameter"] ),
-                            'DOCCLEANER_PATH': DOCCLEANER_PATH,
-                            'XSLNUMBER': XSLNUMBER
-                            }
-    
-    
-    path_dict[xslid]["PROCESSINGS"]= str(path_dict)
-
     #Telling Python that the contents of "template.applescript" are a template:
     tpl = Template(contents)
     
     #passing path_dict to the template
-    contents = tpl.substitute(path_dict[xslid])
+    contents = tpl.substitute(path_dict)
 
     #escaping the quotes
-    contents = contents.replace('"', '\"')
+    #contents = contents.replace('"', '\"')
                 
     #Generating a list of commands for osacompile
     command_list = (contents.expandtabs()).split("\n")
@@ -73,11 +71,11 @@ for button in jsonConf["buttons"]:
     command_list = [' -e "{0}"'.format(command) for command in command_list if command]
     
     #appending a -o parameter to the list, containing the path to the script we want to compile
-    processing_name = os.path.splitext(filename)[0] #TODO: giving a friendlier, localized name to this variable
+    processing_name = str(button["tag"])
     command_list.append(' -o '+ os.path.join(SCRIPTS_PATH,  processing_name +".scpt") )
-
+    jj+=1
     #launching the compilation with osacompile 
     os.system("osacompile " + ''.join(command_list)) #TODO: test...
-         
+
 
 
