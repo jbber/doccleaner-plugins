@@ -33,7 +33,7 @@ import mimetypes
 
 from doccleaner import doccleaner
 #import doccleaner.localization
-#win32com.client.gencache.is_readonly=False
+win32com.client.gencache.is_readonly=False
 #win32com.client.gencache.GetGeneratePath()
 # Support for COM objects we use.
 gencache.EnsureModule('{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}', 0, 2, 1, bForDemand=True) # Office 9
