@@ -17,16 +17,22 @@ from win32com.client import gencache, DispatchWithEvents
 import winerror
 import pythoncom
 from win32com.client import constants, Dispatch
-import sys
 import win32com.client
-
-import os
 import win32ui
 import win32con
+import os
+import sys
+
+#Needed for pynsist - otherwise Python won't find the packages in the pkgs directory
+scriptdir, script = os.path.split(__file__)
+pkgdir = os.path.join(scriptdir, 'pkgs')
+sys.path.insert(0, pkgdir)
+os.environ['PYTHONPATH'] = pkgdir + os.pathsep + os.environ.get('PYTHONPATH', '')
+
+
 import locale
 import gettext
 import simplejson
-
 import tempfile
 import shutil
 import mimetypes
@@ -118,13 +124,13 @@ class WordAddin:
 
         #Creating a word object inside a wd variable
         wd = win32com.client.Dispatch("Word.Application")
-
+        
         try:
             #Check if the file is not a new one (unsaved)
             if os.path.isfile(wd.ActiveDocument.FullName) == True:
                 #Before processing the doc, let's save the user's last modifications
                 #TODO: ne fonctionne pas correctement
-                wd.ActiveDocument.Save
+                wd.ActiveDocument.Save()
 
                 originDoc = wd.ActiveDocument.FullName #:Puts the path of the current file in a variable
                 tmp_dir = tempfile.mkdtemp() #:Creates a temp folder, which will contain the temp docx files necessary for processing
@@ -181,21 +187,20 @@ class WordAddin:
                 # 2) Other programs, like antiviruses, may use simulteanously the clipboard, which would result in a big mess for the user.
                 #Instead, use the Content.FormattedText function, it's simple, and takes just one line of code:
                 wd.Documents(originDoc).Content.FormattedText = wd.Documents(newDoc).Content.FormattedText
-
                 #Closing and removing the temp document
                 wd.Documents(newDoc).Close()
                 os.remove(newDoc)
 
                 #Saving the changes
-                wd.Documents(originDoc).Save
-                
+                wd.ActiveDocument.Save()
+                               
                 #Removing the whole temp folder
                 try:
                     shutil.rmtree(tmp_dir)
                 except:
                     #TODO: What kind of error would be possible when removing the temp folder? How to handle it?
                     pass
-                wd.ActiveDocument.Save
+                
             else:
                 win32ui.MessageBox("You need to save the file before launching this script!"
                 ,"Error",win32con.MB_OK)
