@@ -1,7 +1,8 @@
 {
     "buttons": [
                      {
-                     "tag":"CleanDirectFormatting",                                                        
+                     "tag":"CleanDirectFormatting",			
+					 "action":"do",
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -10,12 +11,14 @@
                                  "getTempDir":0,
                                  "XSLname":"cleanDirectFormatting.xsl"
                              }
-                            ]
+                            ],
+					"image": null
                                          
                      },
                      
 					 {
-                     "tag":"Hyperlinks",                                                        
+                     "tag":"Hyperlinks",  
+					 "action":"do",					 
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -45,11 +48,14 @@
                                  "getTempDir":0,
                                  "XSLname":"relations.xsl"
                              }
-                            ]
+                            ],
+					"image": null
                       },
                       
                       {
-                     "tag":"nonbreakingspaces",                                                        
+                     "tag":"nonbreakingspaces",  
+					 "action":"do",					 
+					 		 
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -58,11 +64,14 @@
                                  "getTempDir":0,
                                  "XSLname":"insecables.xsl"
                              }
-                            ]
+                            ],
+					"image": null
                       },       
                       
                       {
-                     "tag":"curlyapostrophes",                                                        
+                     "tag":"curlyapostrophes",    
+					 "action":"do",					 
+					 		 
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -71,11 +80,14 @@
                                  "getTempDir":0,
                                  "XSLname":"apostrophe_document.xsl"
                              }
-                            ]
+                            ],
+					"image": null
                       },
                       
                       {
-                     "tag":"pointtiles",                                                        
+                     "tag":"pointtitles",     
+					 "action":"do",					 
+						 
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -84,11 +96,14 @@
                                  "getTempDir":0,
                                  "XSLname":"points_titres_document.xsl"
                              }
-                            ]
+                            ],
+					"image": null
                       },
                       
                       {
-                     "tag":"abstractspara",                                                        
+                     "tag":"abstractspara",  
+					 "action":"do",					  
+							 
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -97,11 +112,14 @@
                                  "getTempDir":0,
                                  "XSLname":"sauts_paragraphes_resumes_affiliations.xsl"
                              }
-                            ]
+                            ],
+					"image": null
                       },
                       
                       {
-                     "tag":"quotationmarks",                                                        
+                     "tag":"quotationmarksfr",    
+					 "action":"do",					 
+							 
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -110,12 +128,15 @@
                                  "getTempDir":0,
                                  "XSLname":"guillemets.xsl",
                                  "comment":"open_quotes='«',closing_quotes='»'"                             }
-                            ]
+                            ],
+					"image": null
                       },                      
                       
                       
                        {
-                     "tag":"ponctuationpara",                                                        
+                     "tag":"ponctuationpara",      
+					 "action":"do",					 
+					 				 
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -131,11 +152,14 @@
                                  "getTempDir":0,
                                  "XSLname":"Ponctuation_paragraphes_comments.xsl"
                              }
-                            ]
+                            ],
+					"image": null
                       },
                     
                       {
-                     "tag":"emptyline",                                                        
+                     "tag":"emptyline",   
+					 "action":"do",					 
+						 
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -144,11 +168,14 @@
                                  "getTempDir":0,
                                  "XSLname":"double_saut_paragraphe.xsl"
                              }
-                            ]
+                            ],
+					"image": null
                       },   
                              
                       {
-                     "tag":"endnotesnumber",                                                        
+                     "tag":"endnotesnumber",   
+					 "action":"do",					     
+					 
                      "xsl":[
                              {
                                  "xslid":"1",
@@ -157,15 +184,15 @@
                                  "getTempDir":0,
                                  "XSLname":"Numerotation_notes.xsl"
                              }
-                            ]
-                      },              
-                      
-                      
-                      
-                     {                          
-                       "tag":"Titre",                                                                     
-                       "onAction":"apply_style"                                                                                                        
-                     }
+                            ],
+					"image": null
+                      },
+					  
+					  {
+                     "tag":"removeBookmarks",   
+					 "action":"removeBookmarks",		
+					 "image": null
+					 }
                       
                 ]
                    

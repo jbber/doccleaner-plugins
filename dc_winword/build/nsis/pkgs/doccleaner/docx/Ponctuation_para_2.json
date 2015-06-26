@@ -1,6 +1,0 @@
-{ 
-
-    "subfile_input" : ["word/document.xml"], 
-    "subfile_output": ["word/comments.xml"]
-   
-}
